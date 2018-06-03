@@ -38,7 +38,7 @@ jobs:
       - secure: oEUum6u4qsiweqznEgs9hbcZVSVIs4mOD8mlaVRS4ITcNcvXk7pBiqT3IEwS3g7xHONKZFwWk7k3tgXZWSNYRnLuVxGfte35gX+dU5rKcXnWHPnZXNjMBX1JF2Oz2u6QzlIWJzSD81X7fFrDsAMHMzn1+lW5fxgKX/E5qUF5FIj9OSkMHL29PDgpa1Wdeg3TH1HY/8/HSkLDvKHtm9Br7D4lv15J677uVqjIIEF3dOtLfAlyaBuxZKh08587YpYvsA4Y6NjCKlQkSuotpikHUDMOyjfIwI6F5UlwxOu7u0eVDAZyxBb8HaWJUiP+9OsokBAWnAWvBLlLY62zo+OpQ59Jv3lUs2dGW2uXTrCT2xbxHJAA7RJg4lPxW760L9LEdoZA6Yg5gFsKeXXrJeFJnhOE/BMGEJ1HZ9sRhJqc8RW/6clcwoJ+QuUKdi8ht+5F72AyCtOmYwPkyQEEs0+w0pTqGDFmUQ9+NZR+/5RZ0zlYAOYHjmtS8IlMFR4Ur/fvMXfoYuWkRSS7o0Q8IiJFqcBAVENMPiKbpRyVxxg0bF4lgQafcKxpBk3txIolWlsCyYg+zuBl+TMOKvd/oTFt3NT3wrMuKlexUoi0XxyRrSzBBZl8mbY4epK1Kl5pIPwjist8qn0qNMRPFi7VobJ8Ek8kE/7Q5KL+tqX//r7CoBs=
     script:
       - tox -e build
-      - docker build -f docker/counter/Dockerfile -t rmb938/vmw-cloudinit-metadata:latest .
+      - docker build -t rmb938/vmw-cloudinit-metadata:latest .
       - docker tag rmb938/vmw-cloudinit-metadata:latest "rmb938/vmw-cloudinit-metadata:$TRAVIS_TAG"
       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
       - docker push "rmb938/vmw-cloudinit-metadata:$TRAVIS_TAG"
