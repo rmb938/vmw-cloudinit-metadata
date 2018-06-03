@@ -39,7 +39,7 @@ jobs:
     script:
       - tox -e build
       - docker build -f docker/counter/Dockerfile -t rmb938/vmw-cloudinit-metadata:latest .
-      - docker tag sandwichcloud/deli-counter:latest "rmb938/vmw-cloudinit-metadata:$TRAVIS_TAG"
+      - docker tag rmb938/vmw-cloudinit-metadata:latest "rmb938/vmw-cloudinit-metadata:$TRAVIS_TAG"
       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
       - docker push "rmb938/vmw-cloudinit-metadata:$TRAVIS_TAG"
       - docker push rmb938/vmw-cloudinit-metadata:latest
