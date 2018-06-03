@@ -1,0 +1,46 @@
+language: python
+python:
+- '3.6'
+env:
+- TOXENV=flake8
+- TOXENV=build
+addons:
+  apt:
+    packages:
+       - docker-ce=18.03.1~ce-0~ubuntu
+install:
+- docker --version
+- pip install tox
+script: tox
+services:
+- docker
+stages:
+- test
+- name: pypi
+  if: tag IS present
+- name: docker
+  if: tag IS present
+jobs:
+  include:
+  - stage: pypi
+    script: echo "Deploying to PyPi"
+    deploy:
+      provider: pypi
+      distributions: bdist_wheel
+      user: rmb938
+      password:
+        secure: fqnQOZQIdcf/lsKxiRdfYo08MWtCvWU2nnXjWQDxwx2XWQ6OQZn5iG2Ew4JajoKPyhRFEIr3jWLTZ46/PMMmg60+Zra9gbD8ebCRFqk3QwdEd++Q810Q6lvZYhggsQNIKq6/VKRnfDU2CuaPHoDs/kB48cSDoQbrAi7ygp/7VQBV4wgmGgLl6Z6F5IAB/na37ryIgO+Edc21YVwPNANQ0Eohw6BATiti8S6EZXdFildVt18y7WRgzj+0LHYMb5Vg7ejb3HEJwzR6GqiiUxrMRKUYQVApR/wOLvK/hC+7cE3bWn6GacYSAa5B758gTUlcpC4LSI6xvHsNzVvQDwH59aQwvdlgr6SUUA5e2NYLPqk3qDtoTdJlk7xgh+AA+u8B1biWyHq6lfN0KaANUatpKYX/oNWpaf1QcMxsL/Wk/wnyNf2qZrAC9FVxyecfMPdSJsIkhRDenr7RWSiH57d2AF6VRbeEzR72B4nqaG2MHGn0d6AIxuIZ9XT3STy5c/93zObXOW1QpskYP+M61mSHTmojVCbKa2o33ZgABay+SbZJUaJyOeLvcskC0TrK9pZxQ2cZjKg9s3t8RmZsMVc94N7pYKX9VmLuim9ZVwzBPhgo8+vhDwKQi/I4IjxDUWmOmm9iQ50dZ97dihrBdz+zUuKTjS54k1hko0DEW7RuM5o=
+      on:
+        tags: true
+  - stage: docker
+    env:
+      - secure: Ib4G+bUUr8OlCzid6i5/At4ow+y981mi4OjJQMvfbFUCAvoDiNLqEmdW+bJYUIIz9QYvPB3oe8lYr3g76oEdn80VUIp/KuC3mhs9PnddxRmPqufB9Y/+sC2kTVAJZwmYT9vG0mGQMQEeirmb35M2Y3GOgGeDJulTyCpFzNHJOkj/i7xN+Z2g0IC8npwx9BCFA2nA7GjB9MSe9IrLU8NW92+FGz0Kl4P2AtB1Wqjk8L2uOLv0To6kVurMS8qOluDLkaz5R6ypJErZ6y7HKzCSKSQtMsAQt+WxddFlgh0veRaCthjgDuaoZgbPXEG/iUlhNheKfU44KpNMqbo0WLWuELYKoQP04oR9UT02/Qb7WOtQlIHhzB4od9AOKnlMt9l8cTrFujvC7D0Eo6uOLuX7D3ppM8ZFFc8+jMD/7XrsLPCQpBvyR+39Y6l9bN4jOcnU0B+jXqZZR499Xg24XAHV6EUwV1cAzFfSXYKobm/Qhj+4e85cwwyy11RooZdvq46hVrd12QWeiLIQ5jdCtl31AuK3l1sMtjm4rJVAeahTykTFsfYOY/MFKpDhkqWqaa75nJlTDo2pPAeKqUS88kuJ1SqKxRAh7t+mHz/ZkDY4A3r9BGTJe9CfSnG91VoF5Ok9ZsUF5+XQI8UIawqkhOHI3shXxR332Y+lpGKqFd3UAu0=
+      - secure: oEUum6u4qsiweqznEgs9hbcZVSVIs4mOD8mlaVRS4ITcNcvXk7pBiqT3IEwS3g7xHONKZFwWk7k3tgXZWSNYRnLuVxGfte35gX+dU5rKcXnWHPnZXNjMBX1JF2Oz2u6QzlIWJzSD81X7fFrDsAMHMzn1+lW5fxgKX/E5qUF5FIj9OSkMHL29PDgpa1Wdeg3TH1HY/8/HSkLDvKHtm9Br7D4lv15J677uVqjIIEF3dOtLfAlyaBuxZKh08587YpYvsA4Y6NjCKlQkSuotpikHUDMOyjfIwI6F5UlwxOu7u0eVDAZyxBb8HaWJUiP+9OsokBAWnAWvBLlLY62zo+OpQ59Jv3lUs2dGW2uXTrCT2xbxHJAA7RJg4lPxW760L9LEdoZA6Yg5gFsKeXXrJeFJnhOE/BMGEJ1HZ9sRhJqc8RW/6clcwoJ+QuUKdi8ht+5F72AyCtOmYwPkyQEEs0+w0pTqGDFmUQ9+NZR+/5RZ0zlYAOYHjmtS8IlMFR4Ur/fvMXfoYuWkRSS7o0Q8IiJFqcBAVENMPiKbpRyVxxg0bF4lgQafcKxpBk3txIolWlsCyYg+zuBl+TMOKvd/oTFt3NT3wrMuKlexUoi0XxyRrSzBBZl8mbY4epK1Kl5pIPwjist8qn0qNMRPFi7VobJ8Ek8kE/7Q5KL+tqX//r7CoBs=
+    script:
+      - tox -e build
+      - docker build -f docker/counter/Dockerfile -t rmb938/vmw-cloudinit-metadata:latest .
+      - docker tag sandwichcloud/deli-counter:latest "rmb938/vmw-cloudinit-metadata:$TRAVIS_TAG"
+      - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+      - docker push "rmb938/vmw-cloudinit-metadata:$TRAVIS_TAG"
+      - docker push rmb938/vmw-cloudinit-metadata:latest
+

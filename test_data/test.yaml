@@ -1,0 +1,26 @@
+metadata:
+  ami_id: my-image
+  instance_id: my-instance
+  region: us-east1
+  availability_zone: us-east1-a
+  tags:
+    - a
+    - b
+    - c
+  public_keys:
+    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDB9FH324syhZ88B3TiMkYIMrI2/yvCF+tiWk+eOQKnmxA4zXSeVot1z52fk6P2xdZU9jzni2Qm5PihVKclzQmvIijpXV7MBXQS2/G100FyfZL76LK/ZLGITE3MU2+iBVH59gq+sJywQXkXYLngZiChVbokFidND39kNuQXQZCb2lnKXwM6KLMn4v9nFBTYQmjImqm+2BMsKgdupaYm+qzr+Gr8lLitb+VKJtsrnRaW0NerTLNr3fXtw0sgeQkcQtqaKOvPRocUoa7qnzI0TP8Mx02klTiWwHvPzc9e0HztXOQwYZB6/dcB9CoglLYnzcTf2cEVGHO9NGb9GLqn3Oph
+  hostname: test.rmb938.me
+network:
+  address: 192.168.23.1
+  netmask: 255.255.255.0
+  gateway: 192.168.23.254
+  search:
+    - 'rmb938.me'
+  nameservers:
+    - 8.8.8.8
+    - 8.8.4.4
+userdata: |
+  #cloud-config
+  write_files:
+   - path: /tmp/hello-cloud
+     content: "Hello from metadata!"
