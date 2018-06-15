@@ -12,6 +12,7 @@ from schematics import Model
 from schematics.exceptions import ConversionError, ValidationError
 from schematics.types import StringType, BaseType
 from schematics.types.compound import ModelType, ListType
+
 from vmw_cloudinit_metadata.vspc.async_telnet import CR
 
 
@@ -99,12 +100,13 @@ class VMClient(object):
     def __init__(self, vm_name, writer, driver):
         self.logger = logging.getLogger("%s.%s" % (self.__module__, self.__class__.__name__))
         self.vm_name = vm_name
+        self.vm_uuid = None
         self.writer = writer
         self.driver = driver
 
     async def write_metadata(self):
 
-        instance_data: InstanceData = self.driver.get_instance(self.vm_name)
+        instance_data: InstanceData = self.driver.get_instance(self)
         if instance_data is None:
             return
         instance_metadata: InstanceMetadata = instance_data.metadata
@@ -123,7 +125,7 @@ class VMClient(object):
         await self.write(PacketCode.RESPONSE_METADATA, json.dumps(metadata))
 
     async def write_userdata(self):
-        instance_data: InstanceData = self.driver.get_instance(self.vm_name)
+        instance_data: InstanceData = self.driver.get_instance(self)
         if instance_data is None:
             return
 
@@ -133,7 +135,7 @@ class VMClient(object):
         await self.write(PacketCode.RESPONSE_USERDATA, userdata)
 
     async def write_networkdata(self):
-        instance_data: InstanceData = self.driver.get_instance(self.vm_name)
+        instance_data: InstanceData = self.driver.get_instance(self)
         if instance_data is None:
             return
         instance_network: InstanceNetworkData = instance_data.network

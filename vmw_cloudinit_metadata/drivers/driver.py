@@ -20,5 +20,5 @@ class Driver(object):
         raise NotImplemented
 
     @abstractmethod
-    def get_instance(self, vm_name) -> Optional[InstanceData]:
+    def get_instance(self, vm_client) -> Optional[InstanceData]:
         raise NotImplemented

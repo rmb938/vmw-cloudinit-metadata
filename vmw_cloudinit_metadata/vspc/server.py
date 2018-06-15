@@ -22,6 +22,7 @@ import base64
 import functools
 import logging
 import os
+import uuid
 
 from vmw_cloudinit_metadata.vspc import async_telnet
 from vmw_cloudinit_metadata.vspc.async_telnet import IAC, SB, SE, WILL, WONT, DONT, DO
@@ -41,6 +42,8 @@ VMOTION_COMPLETE = bytes([46])
 VMOTION_ABORT = bytes([48])
 VM_VC_UUID = bytes([80])
 GET_VM_VC_UUID = bytes([81])
+VM_BIOS_UUID = bytes([84])
+GET_VM_BIOS_UUID = bytes([85])
 VM_NAME = bytes([82])
 GET_VM_NAME = bytes([83])
 DO_PROXY = bytes([70])
@@ -50,8 +53,8 @@ WONT_PROXY = bytes([73])
 SUPPORTED_OPTS = (KNOWN_SUBOPTIONS_1 + KNOWN_SUBOPTIONS_2 + VMOTION_BEGIN +
                   VMOTION_GOAHEAD + VMOTION_NOTNOW + VMOTION_PEER +
                   VMOTION_PEER_OK + VMOTION_COMPLETE + VMOTION_ABORT +
-                  VM_VC_UUID + GET_VM_VC_UUID + VM_NAME + GET_VM_NAME +
-                  DO_PROXY + WILL_PROXY + WONT_PROXY)
+                  VM_VC_UUID + GET_VM_VC_UUID + VM_NAME + VM_BIOS_UUID +
+                  GET_VM_BIOS_UUID + GET_VM_NAME + DO_PROXY + WILL_PROXY + WONT_PROXY)
 
 
 class VSPCServer(object):
@@ -90,11 +93,21 @@ class VSPCServer(object):
             writer.write(IAC + SB + VMWARE_EXT + WILL_PROXY + IAC + SE)
             await writer.drain()
 
-    def handle_vm_name(self, socket, writer, data):
+    async def handle_vm_name(self, socket, writer, data):
         peer = socket.getpeername()
         vm_name = data.decode('ascii')
         self.logger.debug("<< %s VM-NAME %s", peer, vm_name)
         self.sock_to_client[socket] = self.driver.new_client(vm_name, writer)
+        self.logger.debug(">> %s GET_VM_BIOS_UUID", peer)
+        writer.write(IAC + SB + VMWARE_EXT + GET_VM_BIOS_UUID + IAC + SE)
+        await writer.drain()
+
+    def handle_vm_uuid(self, socket, writer, data):
+        peer = socket.getpeername()
+        vm_uuid = data.decode('ascii').replace(" ", "").replace("-", "")
+        self.logger.debug("<< %s GET_VM_BIOS_UUID %s", peer, vm_uuid)
+        vm_client = self.sock_to_client.get(socket)
+        vm_client.vm_uuid = uuid.UUID(vm_uuid)
 
     async def handle_vmotion_begin(self, writer, data):
         socket = writer.get_extra_info('socket')
@@ -153,7 +166,9 @@ class VSPCServer(object):
             elif vmw_cmd == DO_PROXY:
                 await self.handle_do_proxy(writer, data[2:])
             elif vmw_cmd == VM_NAME:
-                self.handle_vm_name(socket, writer, data[2:])
+                await self.handle_vm_name(socket, writer, data[2:])
+            elif vmw_cmd == VM_BIOS_UUID:
+                self.handle_vm_uuid(socket, writer, data[2:])
             elif vmw_cmd == VMOTION_BEGIN:
                 await self.handle_vmotion_begin(writer, data[2:])
             elif vmw_cmd == VMOTION_PEER:
@@ -193,7 +208,7 @@ class VSPCServer(object):
         data = await telnet.read_line()
         vm_client = self.sock_to_client.get(socket)
         if vm_client is None:
-            self.logger.error("%s didn't present UUID", peer)
+            self.logger.error("%s didn't present vm name", peer)
             writer.close()
             return
         try:

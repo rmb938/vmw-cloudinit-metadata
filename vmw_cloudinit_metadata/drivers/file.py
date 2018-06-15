@@ -6,6 +6,7 @@ import yaml
 from schematics import Model
 from schematics.exceptions import DataError
 from schematics.types import StringType
+
 from vmw_cloudinit_metadata.drivers.driver import Driver
 from vmw_cloudinit_metadata.vspc.vm_client import InstanceData
 
@@ -22,7 +23,8 @@ class FileDriver(Driver):
 
         return options
 
-    def get_instance(self, vm_name) -> Optional[InstanceData]:
+    def get_instance(self, vm_client) -> Optional[InstanceData]:
+        vm_name = vm_client.vm_name
         file_path = os.path.join(self.options.directory, vm_name + ".yaml")
         if os.path.isfile(file_path) is False:
             self.logger.error("Could not find metadata file (%s) for VM %s" % (file_path, vm_name))
