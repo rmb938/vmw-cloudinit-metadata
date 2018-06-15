@@ -100,7 +100,8 @@ class VMClient(object):
     def __init__(self, vm_name, writer, driver):
         self.logger = logging.getLogger("%s.%s" % (self.__module__, self.__class__.__name__))
         self.vm_name = vm_name
-        self.vm_uuid = None
+        self.vm_bios_uuid = None
+        self.vm_vc_uuid = None
         self.writer = writer
         self.driver = driver
 

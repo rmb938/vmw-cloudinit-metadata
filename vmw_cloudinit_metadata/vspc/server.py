@@ -102,12 +102,22 @@ class VSPCServer(object):
         writer.write(IAC + SB + VMWARE_EXT + GET_VM_BIOS_UUID + IAC + SE)
         await writer.drain()
 
-    def handle_vm_uuid(self, socket, writer, data):
+    async def handle_vm_bios_uuid(self, socket, writer, data):
         peer = socket.getpeername()
-        vm_uuid = data.decode('ascii').replace(" ", "").replace("-", "")
-        self.logger.debug("<< %s GET_VM_BIOS_UUID %s", peer, vm_uuid)
+        vm_bios_uuid = data.decode('ascii').replace(" ", "").replace("-", "")
+        self.logger.debug("<< %s GET_VM_BIOS_UUID %s", peer, vm_bios_uuid)
         vm_client = self.sock_to_client.get(socket)
-        vm_client.vm_uuid = uuid.UUID(vm_uuid)
+        vm_client.vm_bios_uuid = uuid.UUID(vm_bios_uuid)
+        self.logger.debug(">> %s GET_VM_VC_UUID", peer)
+        writer.write(IAC + SB + VMWARE_EXT + GET_VM_VC_UUID + IAC + SE)
+        await writer.drain()
+
+    def handle_vm_vc_uuid(self, socket, writer, data):
+        peer = socket.getpeername()
+        vm_vc_uuid = data.decode('ascii').replace(" ", "").replace("-", "")
+        self.logger.debug("<< %s GET_VM_VC_UUID %s", peer, vm_vc_uuid)
+        vm_client = self.sock_to_client.get(socket)
+        vm_client.vm_vc_uuid = uuid.UUID(vm_vc_uuid)
 
     async def handle_vmotion_begin(self, writer, data):
         socket = writer.get_extra_info('socket')
@@ -168,7 +178,9 @@ class VSPCServer(object):
             elif vmw_cmd == VM_NAME:
                 await self.handle_vm_name(socket, writer, data[2:])
             elif vmw_cmd == VM_BIOS_UUID:
-                self.handle_vm_uuid(socket, writer, data[2:])
+                await self.handle_vm_bios_uuid(socket, writer, data[2:])
+            elif vmw_cmd == VM_VC_UUID:
+                self.handle_vm_vc_uuid(socket, writer, data[2:])
             elif vmw_cmd == VMOTION_BEGIN:
                 await self.handle_vmotion_begin(writer, data[2:])
             elif vmw_cmd == VMOTION_PEER:
