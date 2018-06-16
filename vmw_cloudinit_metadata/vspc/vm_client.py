@@ -11,7 +11,7 @@ from cryptography.hazmat.primitives.serialization import load_ssh_public_key
 from schematics import Model
 from schematics.exceptions import ConversionError, ValidationError
 from schematics.types import StringType, BaseType
-from schematics.types.compound import ModelType, ListType
+from schematics.types.compound import ModelType, ListType, DictType
 
 from vmw_cloudinit_metadata.vspc.async_telnet import CR
 
@@ -54,7 +54,7 @@ class InstanceMetadata(Model):
     instance_id = StringType(required=True)
     region = StringType(required=True)
     availability_zone = StringType(required=True)
-    tags = ListType(StringType, default=list)
+    tags = DictType(StringType, default=dict)
     public_keys = ListType(StringType, default=list)
     hostname = StringType(required=True)
 
