@@ -2,4 +2,4 @@ PyYAML==3.12 # MIT
 clify==0.0.3 # MIT
 pbr==4.0.3 # Apache 2.0
 schematics==2.0.1 # BSD 3-clause
-cryptography==2.1.4 # Apache 2.0 or BSD
+cryptography==3.2 # Apache 2.0 or BSD
