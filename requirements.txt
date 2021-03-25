@@ -1,4 +1,4 @@
-PyYAML==3.12 # MIT
+PyYAML==5.4 # MIT
 clify==0.0.3 # MIT
 pbr==4.0.3 # Apache 2.0
 schematics==2.0.1 # BSD 3-clause
